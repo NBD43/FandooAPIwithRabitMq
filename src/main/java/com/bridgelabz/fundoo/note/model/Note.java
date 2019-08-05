@@ -18,7 +18,10 @@ import com.bridgelabz.fundoo.user.model.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.Data;
-@Data
+import lombok.Getter;
+import lombok.Setter;
+@Getter
+@Setter
 @Entity
 @Table
 public class Note implements Serializable {
@@ -68,6 +71,9 @@ public class Note implements Serializable {
 	@JsonIgnore
 	@ManyToMany(cascade = CascadeType.ALL)
 	private List<User> collaboratedUser;
+	
+	
+	
 	
 	
 
