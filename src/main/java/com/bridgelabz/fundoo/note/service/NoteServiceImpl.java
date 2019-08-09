@@ -230,7 +230,7 @@ public class NoteServiceImpl implements NotesService {
 		LocalDateTime today=LocalDateTime.now();
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 		LocalDateTime remind=LocalDateTime.parse(reminderDate, formatter);
-		if(today.isBefore(remind)) {
+		if(remind.isBefore(today)) {
 			throw new UserException(-6,"date is before the orignal time");
 		}
 		notes.setReminder(reminderDate);
@@ -349,6 +349,19 @@ public class NoteServiceImpl implements NotesService {
 				.collect(Collectors.toList());
 
 		user.getNotes().stream().filter(data1 -> (data1.isPined()==true)).collect(Collectors.toList())
+				.forEach(System.out::println);
+		return archieveNote;
+	}
+	
+	@Override
+	public List<Note> getReminderNotes(String token) {
+		long userId = userToken.decodeToken(token);
+
+		User user = userRepository.findById(userId).orElseThrow(() -> new UserException("No note is available"));
+		List<Note> archieveNote = user.getNotes().stream().filter(data -> ((data.getReminder()==null) == false) )
+				.collect(Collectors.toList());
+
+		user.getNotes().stream().filter(data1 -> (data1.isTrash() == false && (data1.getReminder()==null) == false)).collect(Collectors.toList())
 				.forEach(System.out::println);
 		return archieveNote;
 	}

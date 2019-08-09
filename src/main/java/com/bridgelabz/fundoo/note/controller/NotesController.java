@@ -147,6 +147,10 @@ public class NotesController {
 		return listNotes;
 	}
 	
-	
+	@GetMapping("/reminderNotes")
+	public List<Note>getReminderNote(@RequestHeader String token){
+		List<Note> listNotes=noteService.getReminderNotes(token);
+		return listNotes;
+	}
 
 }

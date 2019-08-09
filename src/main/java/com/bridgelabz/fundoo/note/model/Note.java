@@ -65,7 +65,7 @@ public class Note implements Serializable {
 	
 	@Column(name="modified")
 	private LocalDateTime modified;
-	@JsonIgnore
+	//@JsonIgnore
 	@ManyToMany(cascade = CascadeType.ALL)
 	private List<Label> listLabel;
 	@JsonIgnore

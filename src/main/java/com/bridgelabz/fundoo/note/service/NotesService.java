@@ -44,6 +44,8 @@ public interface NotesService {
 
 	List<Note> getPinnedNotes(String token);
 
+	List<Note> getReminderNotes(String token);
+
 	
 
 	
