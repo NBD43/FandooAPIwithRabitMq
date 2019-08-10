@@ -63,7 +63,7 @@ public class NoteServiceImpl implements NotesService {
 		notes.setCreated(LocalDateTime.now());
 		notes.setModified(LocalDateTime.now());
 		user.get().getNotes().add(notes);
-		notesRepository.save(notes);
+		//notesRepository.save(notes);
 		userRepository.save(user.get());
 		
 		
@@ -228,7 +228,7 @@ public class NoteServiceImpl implements NotesService {
 		long id =userToken.decodeToken(token);
 		Note notes=notesRepository.findBynoteIdAndUserId(noteId, id);
 		LocalDateTime today=LocalDateTime.now();
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
 		LocalDateTime remind=LocalDateTime.parse(reminderDate, formatter);
 		if(remind.isBefore(today)) {
 			throw new UserException(-6,"date is before the orignal time");
@@ -271,18 +271,20 @@ public class NoteServiceImpl implements NotesService {
 
 	@Override
 	public Response removeCollabrator(String token, String email, Long noteId) {
+		System.out.println(noteId);
 		long userId=userToken.decodeToken(token);
 		Optional<User> mainUser=userRepository.findById(userId);
+		
 		Optional<User> user=userRepository.findByEmailId(email);
 		if(!user.isPresent()) {
 			throw  new UserException(-4,"No user exit");
 		}
-		Note note=notesRepository.findBynoteIdAndUserId(userId, noteId);
+		Note note=mainUser.get().getNotes().stream().filter(data-> data.getNoteId().equals( noteId)).findFirst().get();
 		if(note==null) {
 			throw new UserException(-5,"No note exist");
 		}
-		if(user.get().getCollabaratedNotes().contains(note)) {
-			throw new UserException(-5,"Note is already collabrated");
+		if(!user.get().getCollabaratedNotes().contains(note)) {
+			throw new UserException(-5,"Note is not collabrated");
 		}
 		
 		user.get().getCollabaratedNotes().remove(note);

@@ -68,7 +68,7 @@ public class Note implements Serializable {
 	//@JsonIgnore
 	@ManyToMany(cascade = CascadeType.ALL)
 	private List<Label> listLabel;
-	@JsonIgnore
+	//@JsonIgnore
 	@ManyToMany(cascade = CascadeType.ALL)
 	private List<User> collaboratedUser;
 	

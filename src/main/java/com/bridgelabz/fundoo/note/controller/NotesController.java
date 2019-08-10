@@ -117,7 +117,7 @@ public class NotesController {
 	}
 	
 	@DeleteMapping("/removecollaborator")
-	public ResponseEntity<Response>CollaboratorRemove(@RequestHeader String token,@RequestParam Long noteId,@RequestHeader String email){
+	public ResponseEntity<Response>CollaboratorRemove(@RequestHeader String token,@RequestParam Long noteId,@RequestParam String email){
 		//logger.info(notesDto.toString());
 		Response responseStatus=noteService.removeCollabrator(token, email, noteId);
 		return new ResponseEntity<Response>(responseStatus,HttpStatus.OK);

@@ -149,6 +149,7 @@ public class UserServiceImpl implements UserService {
 				String token = tokenUtil.createToken(user.get().getUserId());
 				System.out.println(token);
 				response.setToken(token);
+				response.setEmailId(user.get().getEmailId());
 				response.setStatusCode(200);
 				response.setStatusMessage(environment.getProperty("user.login"));
 				return response;
