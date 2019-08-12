@@ -238,6 +238,23 @@ public class NoteServiceImpl implements NotesService {
 		Response response=ResponseHelper.statusResponse(200, environment.getProperty("status.notes.setreminder"));
 		return response;
 	}
+	
+	@Override
+	public Response removeReminder( String token, Long noteId) {
+		long id =userToken.decodeToken(token);
+		Note notes=notesRepository.findBynoteIdAndUserId(noteId, id);
+//		LocalDateTime today=LocalDateTime.now();
+//		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
+//		LocalDateTime remind=LocalDateTime.parse(reminderDate, formatter);
+//		if(remind.isBefore(today)) {
+//			throw new UserException(-6,"date is before the orignal time");
+//		}
+//		notes.setReminder(reminderDate);
+		notes.setReminder(null);
+		notesRepository.save(notes);
+		Response response=ResponseHelper.statusResponse(200, environment.getProperty("status.notes.remove.reminder"));
+		return response;
+	}
 
 
 	@Override

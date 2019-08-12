@@ -46,6 +46,10 @@ public interface NotesService {
 
 	List<Note> getReminderNotes(String token);
 
+	Response removeReminder(String token, Long noteId);
+
+	
+
 	
 
 	

@@ -109,6 +109,13 @@ public class NotesController {
 		return new ResponseEntity<Response>(responseStatus,HttpStatus.OK);
 	}
 	
+	@PutMapping("/removeReminder")
+	public ResponseEntity<Response>removeReminder(@RequestHeader String token,@RequestParam Long noteId){
+		//logger.info(notesDto.toString());
+		Response responseStatus=noteService.removeReminder(token, noteId);
+		return new ResponseEntity<Response>(responseStatus,HttpStatus.OK);
+	}
+	
 	@PostMapping("/addcolaborator")
 	public ResponseEntity<Response>CollaboratorAdd(@RequestHeader String token,@RequestParam Long noteId,@RequestParam String email){
 		//logger.info(notesDto.toString());
