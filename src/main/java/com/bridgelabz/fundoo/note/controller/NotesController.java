@@ -103,7 +103,7 @@ public class NotesController {
 	
 
 	@PutMapping("/reminder")
-	public ResponseEntity<Response>noteReminder(@RequestHeader String token,@RequestParam Long noteId,@RequestHeader String reminderDate){
+	public ResponseEntity<Response>noteReminder(@RequestHeader String token,@RequestParam Long noteId,@RequestParam String reminderDate){
 		//logger.info(notesDto.toString());
 		Response responseStatus=noteService.reminderNote(reminderDate, token, noteId);
 		return new ResponseEntity<Response>(responseStatus,HttpStatus.OK);

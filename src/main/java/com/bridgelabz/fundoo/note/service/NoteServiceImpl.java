@@ -17,8 +17,11 @@ import org.springframework.stereotype.Service;
 
 import com.bridgelabz.fundoo.exception.UserException;
 import com.bridgelabz.fundoo.note.dto.ColorDto;
+import com.bridgelabz.fundoo.note.dto.LabelDto;
 import com.bridgelabz.fundoo.note.dto.NotesDto;
+import com.bridgelabz.fundoo.note.model.Label;
 import com.bridgelabz.fundoo.note.model.Note;
+import com.bridgelabz.fundoo.note.repository.LabelRepository;
 import com.bridgelabz.fundoo.note.repository.NotesRepository;
 import com.bridgelabz.fundoo.response.Response;
 import com.bridgelabz.fundoo.user.model.User;
@@ -34,6 +37,9 @@ public class NoteServiceImpl implements NotesService {
 
 	@Autowired
 	private TokenGenerator userToken;
+	
+	@Autowired
+	private LabelRepository labelRepository;
 
 	@Autowired
 	private ModelMapper modelMapper;
@@ -63,7 +69,7 @@ public class NoteServiceImpl implements NotesService {
 		notes.setCreated(LocalDateTime.now());
 		notes.setModified(LocalDateTime.now());
 		user.get().getNotes().add(notes);
-		//notesRepository.save(notes);
+		notesRepository.save(notes);
 		userRepository.save(user.get());
 		
 		
@@ -341,6 +347,7 @@ public class NoteServiceImpl implements NotesService {
 
 		user.getNotes().stream().filter(data1 -> (data1.isArchived() == false)).collect(Collectors.toList())
 				.forEach(System.out::println);
+		archieveNote.addAll(user.getCollabaratedNotes());
 		return archieveNote;
 	}
 	
@@ -384,7 +391,51 @@ public class NoteServiceImpl implements NotesService {
 				.forEach(System.out::println);
 		return archieveNote;
 	}
+	@Override
+	public Response createNotewithLabel(NotesDto notesDto,LabelDto labelDto, String token) {
+		long userId = userToken.decodeToken(token);
+		logger.info(notesDto.toString());
+		if (notesDto.getTitle().isEmpty() && notesDto.getDescription().isEmpty()) {
 
-	
+			throw new UserException(-5, "Title and description are empty");
+
+		}
+		
+		Optional<Label> labelAvailability = labelRepository.findByUserIdAndLabelName(userId, labelDto.getLabelName());
+		if(labelAvailability.isPresent()) {
+			throw new UserException(-6, "Label already exist");
+		}
+		
+		Label label = modelMapper.map(labelDto,Label.class);
+		
+		label.setLabelName(labelDto.getLabelName());
+		label.setUserId(userId);
+		label.setCreatedDate(LocalDateTime.now());
+		label.setModifiedDate(LocalDateTime.now());
+		labelRepository.save(label);
+		
+		
+		Optional<Label> labelAvailability1 = labelRepository.findByUserIdAndLabelName(userId, labelDto.getLabelName());
+		if(labelAvailability1.isPresent()) {
+			//long labelId= labelAvailability1.get().getLabelId();
+		
+		
+		Note notes = modelMapper.map(notesDto, Note.class);
+		Optional<User> user = userRepository.findById(userId);
+		notes.setUserId(userId);
+		notes.setCreated(LocalDateTime.now());
+		notes.setModified(LocalDateTime.now());
+		notes.getListLabel().add(labelAvailability1.get());;
+		user.get().getNotes().add(notes);
+		notesRepository.save(notes);
+		
+		}
+		
+		/////
+		
+		
+		return null;
+		
+	}
 
 }

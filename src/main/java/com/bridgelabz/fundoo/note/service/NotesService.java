@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.bridgelabz.fundoo.note.dto.ColorDto;
+import com.bridgelabz.fundoo.note.dto.LabelDto;
 import com.bridgelabz.fundoo.note.dto.NotesDto;
 import com.bridgelabz.fundoo.note.model.Note;
 import com.bridgelabz.fundoo.response.Response;
@@ -47,6 +48,8 @@ public interface NotesService {
 	List<Note> getReminderNotes(String token);
 
 	Response removeReminder(String token, Long noteId);
+
+	Response createNotewithLabel(NotesDto notesDto,LabelDto labeldto, String token);
 
 	
 
