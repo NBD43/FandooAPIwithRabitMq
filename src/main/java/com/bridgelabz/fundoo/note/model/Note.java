@@ -33,6 +33,10 @@ public class Note implements Serializable {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long noteId;
 	
+	/*
+	 * @Column(name = "id") private String id;
+	 */
+	
 	@Column(name = "userId")
 	private Long userId;
 	

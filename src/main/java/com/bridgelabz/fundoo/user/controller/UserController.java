@@ -41,6 +41,10 @@ public class UserController {
 
 	@Autowired
 	UserRepo userRepo;
+	@GetMapping
+	public String test() {
+		return "hii testing";
+	}
 	
 	@PostMapping("/register")
 	public ResponseEntity<Response> register(@RequestBody UserDTO userDto)

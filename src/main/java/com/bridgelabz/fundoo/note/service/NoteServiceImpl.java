@@ -19,6 +19,7 @@ import com.bridgelabz.fundoo.exception.UserException;
 import com.bridgelabz.fundoo.note.dto.ColorDto;
 import com.bridgelabz.fundoo.note.dto.LabelDto;
 import com.bridgelabz.fundoo.note.dto.NotesDto;
+import com.bridgelabz.fundoo.note.elasticsearch.SearchService;
 import com.bridgelabz.fundoo.note.model.Label;
 import com.bridgelabz.fundoo.note.model.Note;
 import com.bridgelabz.fundoo.note.repository.LabelRepository;
@@ -52,6 +53,9 @@ public class NoteServiceImpl implements NotesService {
 
 	@Autowired
 	private Environment environment;
+	
+	@Autowired
+	private SearchService searchService;
 
 	@Override
 	public Response createNote(NotesDto notesDto, String token) {
@@ -71,7 +75,12 @@ public class NoteServiceImpl implements NotesService {
 		user.get().getNotes().add(notes);
 		notesRepository.save(notes);
 		userRepository.save(user.get());
-		
+		try {
+			searchService.createNote(notes);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		Response response=ResponseHelper.statusResponse(200, environment.getProperty("status.notes.createdSuccessfull"));
 		return response;
@@ -92,6 +101,12 @@ public class NoteServiceImpl implements NotesService {
 		notes.setDescription(notesDto.getDescription());
 		notes.setModified(LocalDateTime.now());
 		notesRepository.save(notes);
+		try {
+			searchService.updateNote(notes);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		Response response=ResponseHelper.statusResponse(200, environment.getProperty("status.notes.updated"));
 		return response;
 	}
@@ -158,12 +173,24 @@ public class NoteServiceImpl implements NotesService {
 			notes.setPined(true);
 			notes.setModified(LocalDateTime.now());
 			notesRepository.save(notes);
+			try {
+				searchService.updateNote(notes);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			Response response=ResponseHelper.statusResponse(200, environment.getProperty("status.note.pinned"));
 			return response;
 		}else {
 			notes.setPined(false);
 			notes.setModified(LocalDateTime.now());
 			notesRepository.save(notes);
+			try {
+				searchService.updateNote(notes);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			Response response=ResponseHelper.statusResponse(200, environment.getProperty("status.note.unpinned"));
 			return response;
 		
@@ -181,12 +208,24 @@ public class NoteServiceImpl implements NotesService {
 			notes.setArchived(true);;
 			notes.setModified(LocalDateTime.now());
 			notesRepository.save(notes);
+			try {
+				searchService.updateNote(notes);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			Response response=ResponseHelper.statusResponse(200, environment.getProperty("status.note.archieved"));
 			return response;
 		}else {
 			notes.setArchived(false);
 			notes.setModified(LocalDateTime.now());
 			notesRepository.save(notes);
+			try {
+				searchService.updateNote(notes);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			Response response=ResponseHelper.statusResponse(200, environment.getProperty("status.note.unarchieved"));
 			return response;
 		
@@ -205,12 +244,24 @@ public class NoteServiceImpl implements NotesService {
 			notes.setTrash(true);
 			notes.setModified(LocalDateTime.now());
 			notesRepository.save(notes);
+			try {
+				searchService.updateNote(notes);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			Response response=ResponseHelper.statusResponse(200, environment.getProperty("status.note.trashed"));
 			return response;
 		}else {
 			notes.setTrash(false);
 			notes.setModified(LocalDateTime.now());
 			notesRepository.save(notes);
+			try {
+				searchService.updateNote(notes);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			Response response=ResponseHelper.statusResponse(200, environment.getProperty("status.note.untrashed"));
 			return response;
 		
@@ -224,6 +275,12 @@ public class NoteServiceImpl implements NotesService {
 		Note notes=notesRepository.findBynoteIdAndUserId(colorDto.getNoteId(), id);
 		notes.setColour(colorDto.getColor());
 		notesRepository.save(notes);
+		try {
+			searchService.updateNote(notes);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		Response response=ResponseHelper.statusResponse(200, environment.getProperty("status.notes.colour"));
 		return response;
 	}
@@ -241,6 +298,12 @@ public class NoteServiceImpl implements NotesService {
 		}
 		notes.setReminder(reminderDate);
 		notesRepository.save(notes);
+		try {
+			searchService.updateNote(notes);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		Response response=ResponseHelper.statusResponse(200, environment.getProperty("status.notes.setreminder"));
 		return response;
 	}
@@ -258,6 +321,12 @@ public class NoteServiceImpl implements NotesService {
 //		notes.setReminder(reminderDate);
 		notes.setReminder(null);
 		notesRepository.save(notes);
+		try {
+			searchService.updateNote(notes);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		Response response=ResponseHelper.statusResponse(200, environment.getProperty("status.notes.remove.reminder"));
 		return response;
 	}
@@ -286,6 +355,12 @@ public class NoteServiceImpl implements NotesService {
 		note.getCollaboratedUser().add(user.get());
 		userRepository.save(user.get());
 		notesRepository.save(note);
+		try {
+			searchService.updateNote(note);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		Utility.send(email, "Collaborated Note", note.getTitle()+"colaborated with yoy");
 		Response response=ResponseHelper.statusResponse(200, environment.getProperty("status.note.collaborated"));
 		return response;
@@ -314,6 +389,13 @@ public class NoteServiceImpl implements NotesService {
 		note.getCollaboratedUser().remove(user.get());
 		userRepository.save(user.get());
 		notesRepository.save(note);
+		
+		try {
+			searchService.updateNote(note);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		Response response=ResponseHelper.statusResponse(200, environment.getProperty("status.note.removecollaborated"));
 		return response;
