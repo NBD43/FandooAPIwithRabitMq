@@ -25,12 +25,16 @@ import org.elasticsearch.index.query.QueryBuilders;
 
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import com.bridgelabz.fundoo.note.model.Note;
+import com.bridgelabz.fundoo.note.repository.LabelRepository;
+import com.bridgelabz.fundoo.note.repository.NotesRepository;
 import com.bridgelabz.fundoo.response.Response;
+import com.bridgelabz.fundoo.user.repository.UserRepo;
 import com.bridgelabz.fundoo.utility.ResponseHelper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -47,6 +51,19 @@ public class SearchServiceImpl implements SearchService {
 
 	@Autowired
 	 private ObjectMapper objectMapper;
+	@Autowired
+	private LabelRepository labelRepository;
+
+	@Autowired
+	private ModelMapper modelMapper;
+
+	@Autowired
+	private UserRepo userRepository;
+
+	@Autowired
+	private NotesRepository notesRepository;
+
+	
 	 
 	/*
 	 * @Autowired public SearchServiceImpl(RestHighLevelClient client, ObjectMapper
@@ -116,36 +133,42 @@ public class SearchServiceImpl implements SearchService {
 	  
 	 
 	  private List<Note> getSearchResult(SearchResponse response) {
+		//  Client client = node.client();
 	  
 	  SearchHit[] searchHit = response.getHits().getHits();
 	  
-	  List<Note> profileDocuments = new ArrayList<>();
+	  List<Note> notes = new ArrayList<>();
 	  
 	  if (searchHit.length > 0) {
 	  
-	  Arrays.stream(searchHit) .forEach(hit -> profileDocuments .add(objectMapper
+	  Arrays.stream(searchHit) .forEach(hit -> notes .add(objectMapper
 	  .convertValue(hit.getSourceAsMap(), Note.class)) ); }
 	  
-	  return profileDocuments; }
+	  return notes; }
 	  
 	  @Override
 	  public List<Note> searchByLabel(String label) throws Exception {
 	  
-	  SearchRequest searchRequest = new SearchRequest(); SearchSourceBuilder
-	  searchSourceBuilder = new SearchSourceBuilder();
+	  SearchRequest searchRequest = new SearchRequest();
+	  SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+//	  
+//	  QueryBuilder queryBuilder = QueryBuilders .boolQuery() .must(QueryBuilders
+//	  .matchQuery("Note.listLabel.labelName", label));
+//	  System.out.println("hII");
+//	  searchSourceBuilder.query(QueryBuilders .nestedQuery("Note.listLabel",
+//	  queryBuilder, ScoreMode.Avg));
+	 
 	  
-	  QueryBuilder queryBuilder = QueryBuilders .boolQuery() .must(QueryBuilders
-	  .matchQuery("label.labelName", label));
-	  
-	  searchSourceBuilder.query(QueryBuilders .nestedQuery("technologies",
-	  queryBuilder, ScoreMode.Avg));
-	  
+	  QueryBuilder queryBuilder = QueryBuilders .boolQuery() .must(QueryBuilders.queryStringQuery(label).analyzeWildcard(true).field("listLabel.labelName"));
+	  searchSourceBuilder.query(queryBuilder);
+	  System.out.println("hII");
 	  searchRequest.source(searchSourceBuilder);
-	  
+	  System.out.println(searchRequest);
 	  SearchResponse response = client.search(searchRequest,
 	  RequestOptions.DEFAULT);
-	  
-	  return getSearchResult(response); }
+	  System.out.println("hII");
+	  return getSearchResult(response); 
+	  }
 	  
 	  
 	  
@@ -175,6 +198,28 @@ public class SearchServiceImpl implements SearchService {
 	                .name();
 
 	    }
+	  //public List<Note>
+	  public List<Note> searchBytitle(String label) throws Exception {
+		  
+		  SearchRequest searchRequest = new SearchRequest();
+		  SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+		  
+//		  QueryBuilder queryBuilder = QueryBuilders .boolQuery() .must(QueryBuilders
+//		  .matchQuery("Note.title", label));
+		  QueryBuilder queryBuilder = QueryBuilders .boolQuery() .must(QueryBuilders.queryStringQuery(label).analyzeWildcard(true).field("description"));
+		  System.out.println("hII");
+		 
+//		  searchSourceBuilder.query(QueryBuilders .nestedQuery("Note.title",
+//		  queryBuilder, ScoreMode.Avg));
+		  searchSourceBuilder.query(queryBuilder);
+		  System.out.println("hII");
+		  searchRequest.source(searchSourceBuilder);
+		  System.out.println(searchRequest);
+		  SearchResponse response = client.search(searchRequest,
+		  RequestOptions.DEFAULT);
+		  System.out.println("hII");
+		  return getSearchResult(response); 
+		  }
 	 
 
 }

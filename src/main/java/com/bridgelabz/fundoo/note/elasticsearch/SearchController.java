@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,9 +19,11 @@ import org.springframework.web.bind.annotation.RestController;
 import com.bridgelabz.fundoo.note.model.Note;
 @RestController
 @RequestMapping("/user/profile")
+@CrossOrigin(allowedHeaders = "*", origins = "*")
 public class SearchController {
 	
 	private SearchServiceImpl service;
+	
 
     @Autowired
     public SearchController(SearchServiceImpl service) {
@@ -56,9 +59,9 @@ public class SearchController {
     
     @GetMapping(value = "/search")
     public List<Note> search(
-                @RequestParam(value = "labelName") String labelName) 
+                @RequestParam(value = "label") String label) 
                 throws Exception {
-    return service.searchByLabel(labelName);
+    return service.searchByLabel(label);
     }
     
     @DeleteMapping("/{id}")
@@ -68,6 +71,13 @@ public class SearchController {
          return service.deleteNote(id);
 
      }
+    
+    @GetMapping(value = "/searchnote")
+    public List<Note> searchnote(
+                @RequestParam(value = "label") String label) 
+                throws Exception {
+    return service.searchBytitle(label);
+    }
 }
 
 

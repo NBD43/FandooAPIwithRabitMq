@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import com.bridgelabz.fundoo.exception.UserException;
 import com.bridgelabz.fundoo.note.dto.LabelDto;
+import com.bridgelabz.fundoo.note.elasticsearch.SearchService;
 import com.bridgelabz.fundoo.note.model.Label;
 import com.bridgelabz.fundoo.note.model.Note;
 import com.bridgelabz.fundoo.note.repository.NotesRepository;
@@ -45,6 +46,9 @@ public class LabelServiceImpl implements LabelService {
 	
 	@Autowired
 	private Environment environment;
+	
+	@Autowired
+	private SearchService searchService;
 	
 
 	@Override
@@ -155,6 +159,12 @@ public class LabelServiceImpl implements LabelService {
 		note.setModified(LocalDateTime.now());
 		labelRepository.save(label);
 		notesRepository.save(note);
+		try {
+			searchService.updateNote(note);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		
 		Response response=ResponseHelper.statusResponse(100, environment.getProperty("status.label.addedtonote"));
@@ -184,6 +194,12 @@ public class LabelServiceImpl implements LabelService {
 		note.setModified(LocalDateTime.now());
 		labelRepository.save(label);
 		notesRepository.save(note);
+		try {
+			searchService.updateNote(note);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		
 		Response response=ResponseHelper.statusResponse(100, environment.getProperty("status.label.removedfromnote"));
