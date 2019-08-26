@@ -88,14 +88,15 @@ public class UserServiceImpl implements UserService {
 
 		user.setPassword(password);
 		user = userRepo.save(user);
-		Long userId = user.getUserId();
-		String url;
+		
 		try {
 			/*
 			 * url = mailservice.getLink("http://localhost:8010/user/", userId);
 			 * mailmodel.setBody(url+"/valid"); rabbitmq.sendMessageToQueue(mailmodel);
 			 * rabbitmq.send(mailmodel);
 			 */
+			Long userId = user.getUserId();
+			String url;
 			url = Utility.getUrl(userId);
 			System.out.println(url);
 
@@ -121,6 +122,9 @@ public class UserServiceImpl implements UserService {
 	public ResponseToken onLogin(LoginDTO loginDto) {
 		// extract user details by using emailid
 		//long userId = tokenUtil.decodeToken(token);
+		if(loginDto.getEmailId()==null&&loginDto.getPassword()==null) {
+			throw new UserException(404,"data not found");
+		}
 		Optional<User> user = userRepo.findByEmailId(loginDto.getEmailId());
 		System.out.println(user);
 		ResponseToken response = new ResponseToken();
